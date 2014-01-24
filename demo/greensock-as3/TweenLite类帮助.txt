@@ -1,0 +1,90 @@
+TweenLite下载地址：http://blog.greensock.com/tweenlite/
+为什么要用TWEENLITE而不用ADOBE官方的TWEEN?
+效率(这也是作者所标榜的TWEENLITE2大优点之一，呵呵，“标榜”这个词用得可能有点过了，不过人家确实有那个实力)这里有2者运行效率对比的例子：tweening-speed-test
+onComplete, onStart, onUpdate 等回调方法是TWEEN所没有的(TWEENLITE还可以往这些方法中传递任意个参数)
+智能的alpha(当alpha达到0时，TWEENLITE会自动将对象的visible设为false)
+在一次方法调用中就可以缓动多个属性
+可以设置每一次缓动的延时(对有先后顺序的缓动很有效)
+实现任何MovieClip/Sprite的变色效果非常简单
+可以缓动MovieClip的声音
+唯一的from()方法使你可以使用当前的属性值作为缓动的目标值
+使用相关联的值
+在一次方法调用中就可以缓动多个数组的值
+TWEENLITE默认会自动地覆盖同一个对象的缓动以免出现冲突(当然这个特性也是可以关闭的)
+强大的delayedCall()方法使你可以随意设置延时和延时过后所调用的变量，甚至传递任意个数的参数
+TWEENLITE有一个更加powerful的大哥”TweenFilterLite”，而TWEEN只在孤军奋战…当TWEENLITE有什么搞不定的时候，直接去找他大哥.
+用法： 
+TweenLite.to(target:Object, duration:Number, variables:Object);
+Description：将target对象的属性从调用方法时的值缓动到variables中所指定的值
+Parameters：
+target:要缓动的对象(这里注意类型是Object,并不仅仅是MovieClip和Sprite)
+duration:持续的时间(单位是秒)
+variables: 一个Object,包含你想要缓动的所有属性(在TweenLite.from()方法中，这些变量表示的则是开始缓动时的值)，如果你给某个属性加引 号，它将关联到当前的值。例如y:”xxx”,无论你引号里指定多少，它只会缓动到当前的值或者从当前的值开始缓动(在 TweenLite.from()方法中)
+//2者效果是一样的(通常情况下是不需要加引号的
+TweenLite.to(mc, 5, {x:"10", y:"20", ease:Elastic.easeOut});
+TweenLite.to(mc, 5, {x:"20", y:"30", ease:Elastic.easeOut});
+特殊属性：
+delay:Number-延时几秒后开始缓动，这在有先后顺序的缓动效果中很有用
+ease:Function-应用在variables上的缓动函数，比如gs.easing.Elastic.easeOut。默认值是Regular.easeOut.当然你也可以应用CustomEase来定义自己的缓动函数(CustomEase属于收费内容)
+easeParam:Array-给缓动函数提供额外参数的数组。这在使用Elastic缓动函数时控制其他参数比图振幅和周期会非常有用(ADOBE官 方文档中，Elastic.easeXX()方法是可以有6个参数的，但是在TweenLite中只提供4个参数，那么另外2个参数：周期和振幅就可以在 这个数组中给定)。大部分的缓动函数是只有4个参数的，所以通常情况下是不需要传入easeParams参数的。
+autoAlpha:Number-效果和改变”alpha”值一样，但是多了一个特性：如果alpha最终变为0，则自动将visible设为false。同样如果autoAlpha的值大于0，则在开始缓动前会自动将visible设为true
+visible:Boolean-缓动效果结束时DisplayObject对象的visible属性
+volume:Number-缓动对象的SoundTransform属性(例如MovieClip/SoundChannel/NetStream等)
+tint:uint-改变DisplayObject对象的色调，设置一个要缓动到的16进制的颜色值(在from()函数中表示起始值)
+removeTint:Boolean-表示是否要取消一个应用在DisplayObject对象的tint属性
+frame:int-缓动MovieClip到指定的帧(在from()函数中表示起始帧)
+onStart:Function-在缓动开始时触发此方法
+onStartParams:Array-数组，装有传递给onStart方法的参数
+onUpdate:Function-当属性值发生改变时(缓动进行中的每一帧，每一秒)触发此方法
+onUpdateParams:Array-数组，装有传递给OnUpdate方法的参数
+onComplete:Function-在缓动效果结束时触发此方法
+onCompleteParams:Array-数组，装有传递给onComplete方法的参数
+persist:Boolean-如果设为true,在缓动效果结束时，TweenLite实例将不会被垃圾回收器自动回收。当然，persist为true的时候，这个缓动效果仍然可以被其他的缓动覆盖。默认值是false
+renderOnStart:Boolean-在调用TweenLite.from()函数并且还有一个延时的时候，如果想要让指定的起始属性值在延时结 束之后才展现出来的话，将renderOnStart设为true,相反，如果设为false,在延时开始之时就会立即展现指定的起始属性值。默认值是 false
+//mc会在y=20处停留3秒，然后在5秒内缓动到当前位置
+TweenLite.from(mc, 5, { y:20, ease:Elastic.easeOut, delay:3, renderOnStart:false } );
+//mc会在当前位置置停留3秒，然后跳到y=20的位置开始缓动
+TweenLite.from(mc, 5, { y:20, ease:Elastic.easeOut, delay:3, renderOnStart:true } );
+overwrite:Boolean-如果不想让这个缓动效果被应用在同一个对象上的其他缓动效果自动覆盖的话，请将这个值设为false
+TweenLite.from(target:Object, duration:Number, variables:Object); 
+基本上同TweenLite.to()方法一样，唯一不同的是所指定的缓动的属性是起始值
+TweenLite.delayedCall(delay:Number, onComplete:Function, onCompleteParams:Array); 
+提 供一个简单的方法来实现在指定的秒数之后调用指定的方法(其作用相当于setTimeout()方法，如果单为了实现setTimeout的功能而给你的 代码增加3K的重量，实在不值，但是如果项目中已经引入了TweenLite,使用这个方法是个不错的主意)，可以传递任意个数的参数
+Parameters:略…
+TweenLite.killTweensOf(target:Object, complete:Boolean);
+提供一个简单的方法来移除应用在对象上的所有缓动效果，可以指定是否立即强制结束
+Parameters:
+target:目标对象
+complete: 如果设为true,目标对象的缓动效果将会立即结束(缓动的属性直接变为缓动效果结束时的值，同时调用onComplete方法如果定义了的话)，若设为 false,同样会立即结束缓动效果 ，但是属性值将停留在当前缓动到的位置，onComplete函数也不会执行
+TweenLite.killDelayedCallsTo(function:Function);
+提供一个简单的方法来移除TweenLite.delayedCall方法中设置了的方法(其作用相当于clearTimeout)
+Parameters:略..
+TweenLite.removeTween(tween:TweenLite):void
+回收指定的TweenLite的实例
+Parameters:略.
+示例：
+import gs.TweenLite;
+import gs.easing.Back;
+ 
+TweenLite.to(clip_mc, 5, { alpha:0.5, x:120, ease:Back.easeOut, delay:2, onComplete:onFinishTween, onCompleteParams:[5, clip_mc] } );
+ 
+//注意这里的参数，分别对应前面onCompleteParams数组中的类型，而不是Array型
+function onFinishTween(parameter1_num:Number, parameter2_mc:MovieClip):void
+{
+ trace("The tween has finished! parameters: " + parameter1_num + ", and " + parameter2_mc);
+}
+源码包中也有2个很不错的例子~包含了大部分的用法在里面
+About TweenLiteVars
+Jack Doyle在7月15日的更新中加入了类TweenLiteVars，目的是为了让人们可以在FB，FD,FDT等编辑器中可以使用代码提示而不用去记众多的属性，并且能提供更加严谨的数据类型控制。TweenLiteVars类可以在TweenMax源码包中找到。
+TweenLiteVars的用法如下：
+import gs.TweenLite;
+import gs.utils.tween.TweenLiteVars;
+import gs.easing.*;
+ 
+var v:TweenLiteVars = new TweenLiteVars();
+ 
+//with addProps(), you can add up to 15 dynamic properties at a time. addProp() adds one at a time.
+v.addProps("x", 300, false, "y", 100, true);
+v.ease = Elastic.easeOut;
+v.onComplete = myFunction;
+TweenLite.to(my_mc, 2, v);
