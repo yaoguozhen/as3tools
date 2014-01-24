@@ -1,4 +1,4 @@
-﻿package zhen.guo.yao.ytrace 
+﻿package zhen.guo.yao.component.ytrace 
 {
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;

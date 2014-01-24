@@ -1,4 +1,4 @@
-﻿package zhen.guo.yao.ytrace 
+﻿package zhen.guo.yao.component.ytrace 
 {
 	import flash.events.Event;
 	

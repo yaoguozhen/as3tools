@@ -1,4 +1,4 @@
-﻿package zhen.guo.yao.ytrace 
+﻿package zhen.guo.yao.component.ytrace 
 {
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
@@ -121,7 +121,7 @@
 		/**
 		 * 初始化
 		 * @param	obj stage
-		 * @param	key 密集
+		 * @param	key 秘籍
 		 * @param	areaWidth 显示区域的宽度
 		 * @param	areaHeight 显示区域的高度
 		 */
