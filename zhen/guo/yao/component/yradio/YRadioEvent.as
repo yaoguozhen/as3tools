@@ -9,8 +9,7 @@ package zhen.guo.yao.component.yradio
 	public class YRadioEvent extends Event 
 	{
 		public static const CHANGE:String = "valueChange";
-		public var value:Object
-		public var label:String
+		public var data:Object
 		
 		public function YRadioEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{ 

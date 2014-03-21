@@ -24,33 +24,33 @@ package zhen.guo.yao.component.yradio
 			var lastRadio;
 			for (var i:uint = 0; i < n; i++)
 			{
-				var radio:RadioUI = new RadioUI();
-				radio.value = array[i][0];
-				radio.label.autoSize = "left";
-				radio.label.text = array[i][1];
+				var item:RadioUI = new RadioUI();
+				item.value = array[i][0];
+				item.label.autoSize = "left";
+				item.label.text = array[i][1];
 				if (lastRadio)
 				{
 					if (dir == YRadioUI.HENG)
 					{
-						radio.y = 0;
-						radio.x = lastRadio.x + lastRadio.width + dis;
+						item.y = 0;
+						item.x = lastRadio.x + lastRadio.width + dis;
 					}
 					else
 					{
-						radio.x = 0;
-						radio.y = lastRadio.y + lastRadio.height + dis;
+						item.x = 0;
+						item.y = lastRadio.y + lastRadio.height + dis;
 					}
 				}
 				else
 				{
-					radio.x = 0;
-					radio.y = 0;
+					item.x = 0;
+					item.y = 0;
 				}
-				lastRadio = radio;
-				addChild(radio);
+				lastRadio = item;
+				addChild(item);
 			}
 			
-			setRadios(this);
+			setComponent(this);
 		}
 	}
 }

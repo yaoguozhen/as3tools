@@ -1,19 +1,14 @@
 ﻿package zhen.guo.yao.component.yradio
 {
-	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.EventDispatcher;
 	import flash.events.MouseEvent;
-	import flash.events.Event;
-	import flash.geom.Rectangle;
-	import flash.text.engine.GroupElement;
-	import flash.ui.Mouse;
 	
 	public class YRadio extends Sprite
 	{
-		private var _currentRadio:MovieClip
+		private var _currentItem:MovieClip
 		
 		public function YRadio():void 
 		{
@@ -21,37 +16,40 @@
 		}
 		private function clickHandler(evn:MouseEvent):void
 		{
-			var radio:MovieClip = evn.target as MovieClip;
-			if (_currentRadio)
+			var item:MovieClip = evn.target as MovieClip;
+			if (_currentItem)
 			{
-				if (_currentRadio != radio)
+				if (_currentItem != item)
 				{
-					_currentRadio.btn.gotoAndStop(1);
+					_currentItem.btn.gotoAndStop(1);
 				}
 			}
-			_currentRadio = radio;
-			_currentRadio.btn.gotoAndStop(2);
+			_currentItem = item;
+			_currentItem.btn.gotoAndStop(2);
 			
+			var obj:Object = new Object();
+			obj.value = _currentItem.value;
+			obj.label = _currentItem.label.text;
 			var event:YRadioEvent = new YRadioEvent(YRadioEvent.CHANGE);
-			event.value = _currentRadio.value;
-			event.label = _currentRadio.label.text;
+			event.data = obj
 			dispatchEvent(event);
 		}
 		/********************** 公共方法 ***************************/
 		/**
-		 * 设置单选按钮
-		 * @param	radioContainer 单选按钮容器
+		 * 设置按钮
+		 * @param	container 单选按钮容器
 		 */
-		public function setRadios(radioContainer:DisplayObjectContainer):void
+		public function setComponent(container:DisplayObjectContainer):void
 		{
-			var n:uint = radioContainer.numChildren;
+			var n:uint = container.numChildren;
+			
 			for (var i = 0; i < n; i++ )
 			{
-                var radio:MovieClip = radioContainer.getChildAt(i) as MovieClip;
-				radio.btn.gotoAndStop(1)
-				radio.buttonMode = true;
-				radio.mouseChildren = false;
-				radioContainer.addEventListener(MouseEvent.CLICK,clickHandler)
+                var item:MovieClip = container.getChildAt(i) as MovieClip;
+				item.btn.gotoAndStop(1)
+				item.buttonMode = true;
+				item.mouseChildren = false;
+				container.addEventListener(MouseEvent.CLICK,clickHandler)
 			}
 		}
 
