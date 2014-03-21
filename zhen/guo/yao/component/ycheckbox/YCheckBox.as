@@ -78,7 +78,7 @@
 				_container.addEventListener(MouseEvent.CLICK,clickHandler)
 			}
 		}
-		
+		 
         public function get data():Object
 		{
 			return _data
