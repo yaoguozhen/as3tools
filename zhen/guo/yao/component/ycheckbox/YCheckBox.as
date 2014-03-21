@@ -9,6 +9,7 @@
 	public class YCheckBox extends Sprite
 	{
 		private var _container:DisplayObjectContainer
+		private var _data:Array;
 		
 		public function YCheckBox():void 
 		{
@@ -32,8 +33,10 @@
 			changedData.label = item.label.text;
 			changedData.selected = item.selected;
 			
+			_data = getSelectedArray();
+			
 			var event:YCheckBoxEvent = new YCheckBoxEvent(YCheckBoxEvent.CHANGE);
-			event.allData = getSelectedArray();
+			event.allData = _data
 			event.changedDate = changedData;
 			dispatchEvent(event);
 		}
@@ -75,7 +78,11 @@
 				_container.addEventListener(MouseEvent.CLICK,clickHandler)
 			}
 		}
-
+		
+        public function get data():Object
+		{
+			return _data
+		}
 	}
 	
 }

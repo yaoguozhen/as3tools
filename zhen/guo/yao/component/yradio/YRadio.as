@@ -9,6 +9,7 @@
 	public class YRadio extends Sprite
 	{
 		private var _currentItem:MovieClip
+		private var _data:Object
 		
 		public function YRadio():void 
 		{
@@ -17,22 +18,24 @@
 		private function clickHandler(evn:MouseEvent):void
 		{
 			var item:MovieClip = evn.target as MovieClip;
-			if (_currentItem)
+			if (_currentItem != item)
 			{
-				if (_currentItem != item)
+				if (_currentItem)
 				{
 					_currentItem.btn.gotoAndStop(1);
 				}
+				
+				_currentItem = item;
+				_currentItem.btn.gotoAndStop(2);
+				
+				_data = new Object();
+				_data.value = _currentItem.value;
+				_data.label = _currentItem.label.text;
+				
+				var event:YRadioEvent = new YRadioEvent(YRadioEvent.CHANGE);
+				event.data = _data
+				dispatchEvent(event);
 			}
-			_currentItem = item;
-			_currentItem.btn.gotoAndStop(2);
-			
-			var obj:Object = new Object();
-			obj.value = _currentItem.value;
-			obj.label = _currentItem.label.text;
-			var event:YRadioEvent = new YRadioEvent(YRadioEvent.CHANGE);
-			event.data = obj
-			dispatchEvent(event);
 		}
 		/********************** 公共方法 ***************************/
 		/**
@@ -52,7 +55,11 @@
 				container.addEventListener(MouseEvent.CLICK,clickHandler)
 			}
 		}
-
+        
+		public function get data():Object
+		{
+			return _data
+		}
 	}
 	
 }
