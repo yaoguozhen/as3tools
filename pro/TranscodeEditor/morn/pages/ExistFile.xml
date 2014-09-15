@@ -1,0 +1,11 @@
+<View sceneWidth="400" sceneHeight="300" sceneColor="0xffffff" sceneBg="" layers="3,1,1,0,第 3 层;1,1,1,0,第 1 层;2,1,1,0,第 2 层">
+  <Box layers="1,1,0" layer="2" x="0" y="31" var="listBox">
+    <Image url="png.comp.comboboxbg" layer="1" width="132" var="listBG" name="listBG"/>
+    <List layers="1,1,0,0,第1层;2,1,0,0,第 2 层" layer="1" x="6" y="2" repeatX="1" repeatY="5" var="list" name="list" spaceY="8">
+      <UIView source="LabelItem.xml" layer="1" name="render" runtime="transcode.view.ExistFileItemRender" buttonMode="true"/>
+      <VScrollBar skin="png.comp.vscroll" x="104" layer="1" name="scrollBar" height="119" width="19" y="0"/>
+    </List>
+  </Box>
+  <Button skin="png.comp.button_exist_combobox" x="0" y="1" layer="1" var="btn" name="btn" labelColors="0xb6b6b6,0xb6b6b6,0xb6b6b6"/>
+  <Label text="label" x="3" y="6" layer="3" color="0xb6b6b6" width="104" height="18" var="selectedFilesLabel"/>
+</View>

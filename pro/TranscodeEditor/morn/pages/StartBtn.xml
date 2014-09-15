@@ -1,0 +1,4 @@
+<View sceneWidth="400" sceneHeight="300" sceneColor="0xffffff" sceneBg="" layers="1,1,0,0,第 1 层">
+  <Button skin="png.comp.button_start" x="0" y="0" layer="1" var="startBtn"/>
+  <Button skin="png.comp.button_point" x="0" y="0" layer="1" var="pointBtn"/>
+</View>

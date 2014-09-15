@@ -1,0 +1,7 @@
+<View sceneWidth="400" sceneHeight="300" sceneColor="0xffffff" sceneBg="" layers="1,1,0,0,第 1 层">
+  <CheckBox label="切片转码" skin="png.comp.checkbox" x="649" y="10" layer="1" labelColors="0xb6b6b6,0xffffff,0xffffff" var="sectionCheckBox" name="sectionCheckBox"/>
+  <RadioButton label="选择文件" skin="png.comp.radio" layer="1" labelColors="0xb6b6b6,0xffffff,0xffffff" value="0" name="radiogroup_0" x="1" y="6" var="radiogroup_0"/>
+  <RadioButton label="已有视频" skin="png.comp.radio" x="83" layer="1" labelColors="0xb6b6b6,0xffffff,0xffffff" value="1" name="radiogroup_1" y="6" var="radiogroup_1"/>
+  <UIView source="TempleComboBox.xml" x="433" y="3" layer="1" runtime="transcode.view.TempleComboBox" var="templeComboBox"/>
+  <UIView source="ExistFile.xml" x="166" y="1" layer="1" runtime="transcode.view.ExistFileComboBox" var="existFileComboBox"/>
+</View>

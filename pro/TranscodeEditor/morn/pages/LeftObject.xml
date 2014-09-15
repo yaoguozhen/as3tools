@@ -1,0 +1,17 @@
+<View sceneWidth="400" sceneHeight="300" sceneColor="0xffffff" sceneBg="" layers="1,1,0,0,第 1 层" font="Times New Roman">
+  <Image url="png.comp.leftobject" x="0" y="0" layer="1"/>
+  <Box layers="1,1,0" layer="1" x="32" y="31" var="msg">
+    <Label text="label12333" x="158" layer="1" color="0xffd200" size="18" var="videoDuration" stroke="0xf95000,0.2,5,5,10,60" font="Arial" y="1"/>
+    <Label text="label" x="138" y="41" layer="1" size="18" color="0xffd200" var="videoRate" stroke="0xf95000,0.2,5,5,10,60" font="Arial"/>
+    <Label text="label" x="138" y="83" layer="1" color="0xffd200" size="18" var="videoRatio" stroke="0xf95000,0.2,5,5,10,60" font="Arial"/>
+    <Label text="label" x="138" y="124" layer="1" color="0xffd200" size="18" var="videoCodeType" stroke="0xf95000,0.2,5,5,10,60" font="Arial"/>
+    <Label text="label" x="158" y="166" layer="1" color="0xffd200" size="18" var="audioCodeType" stroke="0xf95000,0.2,5,5,10,60" font="Arial"/>
+    <Box layers="1,1,0" layer="1" var="lightBox">
+      <Image url="png.comp.LightPoint" x="23" layer="1"/>
+      <Image url="png.comp.LightPoint" x="7" y="40" layer="1"/>
+      <Image url="png.comp.LightPoint" y="82" layer="1"/>
+      <Image url="png.comp.LightPoint" x="7" y="125" layer="1"/>
+      <Image url="png.comp.LightPoint" x="25" y="166" layer="1"/>
+    </Box>
+  </Box>
+</View>

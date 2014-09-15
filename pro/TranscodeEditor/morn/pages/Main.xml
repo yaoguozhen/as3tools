@@ -1,0 +1,10 @@
+<View sceneWidth="1002" sceneHeight="613" sceneColor="0xffffff" sceneBg="" layers="2,1,0,0,第 2 层;3,1,0,1,第 3 层;1,1,0,1,第 1 层" width="1002" height="613">
+  <UIView source="aa.xml" x="20" y="27" layer="1"/>
+  <Image url="png.comp.bg" x="0" y="0" layer="1"/>
+  <UIView source="SelectVideo.xml" x="234" y="25" layer="1"/>
+  <UIView source="TransTemplate.xml" x="678" y="26" layer="1"/>
+  <UIView source="LeftObject.xml" x="38" y="151.5" layer="3"/>
+  <UIView source="RightObject.xml" x="602" y="151.5" layer="3"/>
+  <UIView source="Ball.xml" x="339" y="115" layer="2"/>
+  <UIView source="StartBtn.xml" x="430" y="463" layer="2"/>
+</View>

@@ -1,0 +1,12 @@
+<View sceneWidth="400" sceneHeight="300" sceneColor="0xffffff" sceneBg="" layers="4,0,1,0,第 4 层;3,0,1,0,第 3 层;2,1,1,0,第 2 层;1,1,1,0,第 1 层" font="黑体">
+  <Image url="png.comp.ball" x="0" y="0" layer="1"/>
+  <Box layers="3,1,1,0,第 3 层;2,1,1,0,第 2 层;1,1,1,0,第1层" layer="2" x="81" y="63" visible="false" var="times">
+    <Label text="00:00:00" y="37" layer="1" color="0xffffff" size="40" var="videoDuration" font="Arial"/>
+    <Label text="00:00:00" y="127" layer="1" color="0xffffff" size="40" var="useTime" x="0" font="Arial"/>
+    <Image url="png.comp.sucaishichang" x="31" layer="2"/>
+    <Image url="png.comp.zhuanmahaoshi" x="33" y="91" layer="3"/>
+  </Box>
+  <FrameClip skin="assets.frameclip_circle" x="1" y="1" layer="3" visible="true" var="doing" autoPlay="false"/>
+  <Label text="0%" x="114" y="271" layer="3" var="doPer" color="0x87fc09" size="22" align="center" autoSize="center"/>
+  <Image url="png.comp.balllabel" x="75" y="124" layer="4" var="firstLabel"/>
+</View>

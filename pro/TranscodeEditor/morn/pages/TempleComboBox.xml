@@ -1,0 +1,8 @@
+<View sceneWidth="400" sceneHeight="300" sceneColor="0xffffff" sceneBg="" layers="6,1,4,0,第 6 层;5,1,4,0,第 5 层;3,1,4,0,第 3 层;4,1,4,0,第 4 层;1,1,4,0,第 1 层;2,1,4,1,第 2 层">
+  <Button skin="png.comp.button_temple" x="0" y="0" layer="1" var="btn" labelColors="0xb6b6b6,0xb6b6b6,0xb6b6b6" labelSize="12" width="202" height="30"/>
+  <Box layers="1,1,0" layer="4" x="2" y="30" var="listBox">
+    <FrameClip skin="assets.frameclip_templeComboboxItem" layer="1" var="list" name="list" width="199" height="133.75" mouseChildren="true" mouseEnabled="true"/>
+    <VScrollBar skin="png.comp.vscroll" x="178" y="2" layer="1" width="19" height="131" var="scrollBar"/>
+  </Box>
+  <Label text="label" x="5" y="6" layer="6" color="0xb6b6b6" width="175" height="18" var="selectedFilesLabel"/>
+</View>

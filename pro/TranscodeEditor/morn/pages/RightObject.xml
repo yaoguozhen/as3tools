@@ -1,0 +1,25 @@
+<View sceneWidth="400" sceneHeight="300" sceneColor="0xffffff" sceneBg="" layers="9,1,1,0,第 9 层;8,0,1,0,第 8 层;7,1,1,0,第 7 层;3,1,1,1,第 3 层;6,1,1,1,第 6 层;4,1,1,1,第 4 层;1,1,1,1,第 1 层;2,1,1,1,第 2 层" var="preMsg">
+  <Image url="png.comp.rightobject" x="0" y="0" layer="2"/>
+  <Button skin="png.comp.button_download" x="211" y="202" layer="2" var="downloadBtn"/>
+  <Box layers="1,1,0" layer="6" x="63" y="31" var="lightNumBox" mouseChildren="false" mouseEnabled="false">
+    <Label text="1" x="2" layer="1" color="0xffb4" size="18" var="lightNum1"/>
+    <Label text="2" x="16" y="39" layer="1" color="0xffb4" size="18" var="lightNum2"/>
+    <Label text="3" x="20" y="80" layer="1" color="0xffb4" size="18" var="lightNum3"/>
+    <Label text="4" x="15" y="121" layer="1" color="0xffb4" size="18" var="lightNum4"/>
+    <Label text="5" y="163" layer="1" color="0xffb4" size="18" var="lightNum5"/>
+  </Box>
+  <Button skin="png.comp.button_1" x="40" y="25" layer="3" var="light1" name="light1"/>
+  <Button skin="png.comp.button_2" x="61" y="65" layer="3" var="light2" name="light2"/>
+  <Button skin="png.comp.button_3" x="72" y="105" layer="3" var="light3" name="light3"/>
+  <Button skin="png.comp.button_4" x="60" y="146" layer="3" var="light4" name="light4"/>
+  <Button skin="png.comp.button_5" x="37" y="187" layer="3" var="light5" name="light5"/>
+  <Box layers="2,1,0,0,第 2 层;1,1,0,0,第1层" layer="7" x="139" y="28" var="cannotPreviewBox">
+    <Label text="该格式视频不支持预览" layer="1" color="0xffffff" size="14" bold="false" var="cannotPreviewLabel" x="1" y="112"/>
+    <Image url="png.comp.tanhao" layer="2"/>
+  </Box>
+  <Box layers="1,1,0" layer="8" x="144" y="56" var="preBox">
+    <Image url="png.comp.preimage" x="26" layer="1"/>
+    <Label text="Video Preview" x="41" y="85" layer="1" color="0xffffff" size="14" var="videoPreviewLabel"/>
+    <Label text="NO.1" y="85" layer="1" color="0xffffff" bold="true" size="14" var="videoIndex"/>
+  </Box>
+</View>
