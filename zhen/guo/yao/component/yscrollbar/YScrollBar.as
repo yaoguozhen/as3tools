@@ -1,337 +1,382 @@
-﻿package zhen.guo.yao.component.yscrollbar
+﻿
+package zhen.guo.yao.component.yscrollbar
 {
-	/**
-	 * 构建滚动条
-	 * @author LOLO
-	 */
-	
-	import flash.display.DisplayObject;
-	import flash.display.DisplayObjectContainer;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.MouseEvent;
-	import flash.events.TimerEvent;
-	import flash.utils.Timer;
 	import flash.geom.Rectangle;
-	
-	import fl.transitions.Tween;
-	import fl.transitions.easing.Strong;
-	
-	
-	
-	public class YScrollBar
-	{
-		private var _component:MovieClip;
-		private var _mask:DisplayObject;//遮罩(滚动区域)
-		private var _scrollBar:DisplayObjectContainer;//滚动条容器
-		private var _content:DisplayObject;//需要进行滚动的对象
-		private var _track:DisplayObject//轨道
-		private var _thumb:Sprite//滑块
-		private var _arrowUp:DisplayObject//向上按钮
-		private var _arrowDown:DisplayObject//向下按钮
-		private var _direction:String;//滚动条是水平滚动还是垂直滚动
+	import flash.display.DisplayObject;
+
+
+	public class YScrollBar extends EventDispatcher {
+
+		public static const V:String = "v";//纵向滚动条
+		public static const H:String = "h";//横向滚动条
 		
-		private var _rThumb:Rectangle;//滑块拖动范围
-		private var _info:Object;//滚动条信息{wh:"width" or "height", xy:"x" or "y"}
-		private var _content_a:int;//内容初始位置
-		private var _isThumbMoveUp:Boolean;//当前是否向上移动滑块 
+		public static const UP_OR_LEFT:String = "up_left";
+		public static const DOWN_OR_RIGHT:String = "down_right";
 		
-		private var _moveContentTimer:Timer;//鼠标按下滑块时，更新移动content
-		private var _repeatDelayTimer:Timer;//鼠标按下arrowUp或arrowDown而未释放，500毫秒后不断进行滚动
-		private var _moveThumbTimer:Timer;//按紧arrowUp或arrowDown时，Thumb不断进行滚动
+		private var _x_y:String; 
+		private var _width_height:String; 
 		
-		private var _contentTween:Tween;//
-		private var _enabled:Boolean;//当前是否可以滚动
+		private var _scrollBar:Sprite;//滚动条
 		
-		private var _hideThumb:Boolean;//是否在不能滚动时，自动隐藏滑块
-		private var _thumbScrollSize:uint;//按紧arrowUp或arrowDown时，滑块滚动的增量
+		private var _btnLeftUp:Sprite;//左或上按钮
+		private var _btnRightDown:Sprite;//右或下按钮
+		private var _block:Sprite;//滑块
+		private var _path:Sprite;//滑道
 		
+		private var _allDistance:Number;//滑道的长度（减去被两个按钮占用的后的长度）
+		private var _rollDistance:Number;//(滑块可滑动的距离)
+		private var _blockStartPosition:Number;//滑块初始位置
 		
+		private var _currentValue:Number=0;//当前value值
+		private var _scollType:String;//滚动模式（横向的还是纵向的）
 		
+		private var _minValue:Number=0;//最小值
+		private var _maxValue:Number = 1;//最大值
+		private var _step:Number = 5;//点击按钮时，滚动的步值
+		
+		private var _fun:Function;//value值改变时调用的方法
+
 		/**
-		 * 构造函数
-		 * @param	p_component 滚动条组件
-		 * @param	p_content 需要进行滚动的对象(被滚动、遮罩的内容)
-		 * @param	p_direction 指示滚动条是水平滚动还是垂直滚动。 有效值为水平:"heng", 垂直:"shu"
-		 * @param	p_hideThumb 是否在不能滚动时，自动隐藏滑块
-		 * @param	p_thumbScrollSize 设置垂直滚动条滑块 [滑轮滚动一次、按钮点击一次、按钮按紧未释放]，滚动多少像素
-		 * @return 
+		 * 判断滚动条元件是否齐全
+		 * @param	scrollBar
 		 */
-		public function init(
-									p_component:MovieClip,
-									p_content:DisplayObject,
-									p_direction:String,
-									p_hideThumb:Boolean = false,
-									p_thumbScrollSize:uint = 10
-									)
+		private function checkObject(scrollBar:Sprite):void
 		{
-			_component = p_component;
-			_mask      = p_component.mask_mc;
-			_content   = p_content;
-			_scrollBar = p_component.scrollBar;
-			_track     = _scrollBar.getChildByName("track");
-			_thumb     = _scrollBar.getChildByName("thumb") as Sprite;
-			_arrowUp   = _scrollBar.getChildByName("arrowUp");
-			_arrowDown = _scrollBar.getChildByName("arrowDown");
-			_hideThumb = p_hideThumb;
-			_thumbScrollSize = p_thumbScrollSize;
+			_scrollBar=scrollBar;
+			_btnLeftUp=_scrollBar.getChildByName("upLeftBtn") as Sprite;
+			_btnRightDown=_scrollBar.getChildByName("downRightBtn") as Sprite;
+			_block=_scrollBar.getChildByName("block") as Sprite;
+			_path=_scrollBar.getChildByName("path") as Sprite;
 			
-			_direction="vertical";
-			if (p_direction == "heng")
+			if (_block == null)
 			{
-				_direction="horizontal"
+				throw new Error("YScrollBar组件中没有找到【block】元件");
 			}
-			
-			_content.x = _mask.x;
-			_content.y = _mask.y;
-			_component.addChild(_content);
-			
-			_content.mask = _mask;
-			
-			_rThumb = new Rectangle(int(_thumb.x), int(_thumb.y));
-			
-			_info = new Object();
-			_info = (_direction == "vertical") ? {wh:"height", xy:"y"} : {wh:"width", xy:"x"};
-			
-			_content_a = (_direction == "vertical") ? int(_content.y) : int(_content.x);
-			
-			_moveContentTimer = new Timer(35);
-			_moveContentTimer.addEventListener(TimerEvent.TIMER, moveContentTimerHandler);
-			
-			_repeatDelayTimer = new Timer(500);
-			_repeatDelayTimer.addEventListener(TimerEvent.TIMER, repeatDelayTimerHandler);
-			
-			_moveThumbTimer = new Timer(100);
-			_moveThumbTimer.addEventListener(TimerEvent.TIMER, moveThumbTimerHandler);
-			
-			//addListeners();
-			change();
-		}
-		
-		
-		//侦听事件
-		private function addListeners():void
-		{
-			if (_direction == "vertical") _content.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);//内容
-			
-			_thumb.addEventListener(MouseEvent.MOUSE_DOWN, thumbMouseDown);//滑块
-			_track.addEventListener(MouseEvent.MOUSE_DOWN, trackMouseDown);//轨道
-			_scrollBar.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);//滚动条容器
-			_track.stage.addEventListener(MouseEvent.MOUSE_UP, stageMouseUp);//舞台
-			
-			if (_arrowUp) _arrowUp.addEventListener(MouseEvent.MOUSE_DOWN, arrowMouseDown);
-			if (_arrowDown) _arrowDown.addEventListener(MouseEvent.MOUSE_DOWN, arrowMouseDown);
-		}
-		
-		//移除事件
-		private function removeListeners():void
-		{
-			if (_direction == "vertical") _content.removeEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
-			
-			_thumb.removeEventListener(MouseEvent.MOUSE_DOWN, thumbMouseDown);
-			_track.removeEventListener(MouseEvent.MOUSE_DOWN, trackMouseDown);
-			_scrollBar.removeEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
-			_track.stage.removeEventListener(MouseEvent.MOUSE_UP, stageMouseUp);
-			
-			if (_arrowUp) _arrowUp.removeEventListener(MouseEvent.MOUSE_DOWN, arrowMouseDown);
-			if (_arrowDown) _arrowDown.removeEventListener(MouseEvent.MOUSE_DOWN, arrowMouseDown);
-		}
-		
-		
-		//滑块，鼠标按下
-		private function thumbMouseDown(event:MouseEvent):void
-		{
-			_rThumb.width  = (_direction == "vertical") ? 0 : _track[_info.wh] - _thumb[_info.wh];
-			_rThumb.height = (_direction == "vertical") ? _track[_info.wh] - _thumb[_info.wh] : 0;
-			_thumb.startDrag(false, _rThumb);
-			_moveContentTimer.start();
-		}
-		
-		//滑块，鼠标按紧未释放时，更新移动content
-		private function moveContentTimerHandler(event:TimerEvent):void
-		{
-			moveContent();
-			event.updateAfterEvent();
-		}
-		
-		
-		
-		//轨道，鼠标按下
-		private function trackMouseDown(event:MouseEvent):void
-		{
-			moveThumb(_scrollBar[(_direction == "vertical") ? "mouseY" : "mouseX"]);
-		}
-		
-		
-		
-		//arrowUp或arrowDown，鼠标按下
-		private function arrowMouseDown(event:MouseEvent):void
-		{
-			_isThumbMoveUp = (event.currentTarget == _arrowUp);
-			moveThumbTimerHandler();
-			_repeatDelayTimer.start()
-		}
-		
-		//鼠标按下arrowUp或arrowDown未释放
-		private function repeatDelayTimerHandler(event:TimerEvent = null):void
-		{
-			_repeatDelayTimer.reset();
-			_moveThumbTimer.start();
-		}
-		
-		
-		//按下arrowUp或arrowDown而未释放，不断进行滚动
-		private function moveThumbTimerHandler(event:TimerEvent = null):void
-		{
-			//如果向上
-			if(_isThumbMoveUp){
-				moveThumb(_thumb[_info.xy] - _thumbScrollSize);
-			
-			}else{
-				moveThumb(_thumb[_info.xy] + _thumb[_info.wh] + _thumbScrollSize);
-			}
-			if(event) event.updateAfterEvent();
-		}
-		
-		
-		//滑轮滚动
-		private function mouseWheelHandler(event:MouseEvent):void
-		{
-			//如果是向下滚动
-			if(event.delta < 0){
-				moveThumb(_thumb[_info.xy] + _thumb[_info.wh] + _thumbScrollSize);
-			//如果向上滚动
-			}else{
-				moveThumb(_thumb[_info.xy] - _thumbScrollSize);
+			if (_path == null)
+			{
+				throw new Error("YScrollBar组件中没有找到【path】元件");
 			}
 		}
-		
-		
-		
-		//更新移动content
-		private function moveContent():void
+		/**
+		 * 初始化滚动条对象
+		 */
+		private function  initObject():void
 		{
-			//算出每个百分点移动的距离
-			var percent:Number = (_content[_info.wh] - _mask[_info.wh]) / 100;
-			//算出移动了多少个百分点
-			var pmove:Number = (_thumb[_info.xy] - _rThumb[_info.xy]) / (_track[_info.wh] - _thumb[_info.wh]) * 100;
+			_block.visible=false;
+			_block.buttonMode = true;
 			
-			var propValue:int = _enabled ? - (int(pmove * percent - _content_a)) : _content_a;
+			if (_scollType == YScrollBar.V)
+			{
+				_x_y = "y";
+				_width_height = "height";
+			}
+			else if (_scollType == YScrollBar.H)
+			{
+				_x_y = "x";
+				_width_height = "width";
+			}
 			
-			//不使用缓动，直接改变content位置
-			//_content[_info.xy] = propValue;
+			/* 如果没有按钮，则生成两个空的按钮，这样其他地方的代码就不用改了 */
+			if (_btnLeftUp)
+			{
+				_btnLeftUp.buttonMode = true;
+			}
+			else
+			{
+				_btnLeftUp = new MovieClip();
+				_btnLeftUp.x = _path.x;
+				_btnLeftUp.y = _path.y;
+				_scrollBar.addChild(_btnLeftUp);
+			}
+			if (_btnRightDown)
+			{
+				_btnRightDown.buttonMode = true;
+			}
+			else
+			{
+				_btnRightDown = new MovieClip();
+				_btnRightDown.x = _path.x+_path.width;
+				_btnRightDown.y = _path.y + _path.height;
+				_scrollBar.addChild(_btnRightDown);
+			}
 			
-			//使用缓动
-			if (_contentTween) _contentTween.stop();
-			_contentTween = new Tween(_content, _info.xy, Strong.easeOut, _content[_info.xy], propValue, 0.5, true);
+			_allDistance=_btnRightDown[_x_y]-_btnLeftUp[_x_y]-_btnLeftUp[_width_height];//计算滑道总长度
+			_blockStartPosition = _btnLeftUp[_x_y] + _btnLeftUp[_width_height];
+			_block[_x_y] = _blockStartPosition;
+			
+			_btnLeftUp.addEventListener(MouseEvent.MOUSE_DOWN, leftUpBtnClickHandler);//点击左或上按钮
+			_btnRightDown.addEventListener(MouseEvent.MOUSE_DOWN, rightDownBtnClickHandler);//点击右或下按钮
+			_block.addEventListener(MouseEvent.MOUSE_DOWN, blockDownHandler);//点击滑块
+			_path.addEventListener(MouseEvent.MOUSE_DOWN, pathClickHandler);//点击滑道
 		}
-		
-		
-		
-		//移动滑块
-		private function moveThumb(scroll:int):void
-		{
-			var propValue:int;
-			
-			//如果向下移动
-			if(scroll > _thumb[_info.xy]){
-				scroll = int(scroll -_thumb[_info.wh]);
-				//5像素内，自动吸附到底端
-				propValue = ((scroll + _thumb[_info.wh] + 5) > (_track[_info.xy] + _track[_info.wh]))
-											? int(_track[_info.xy] + _track[_info.wh] - _thumb[_info.wh])
-											: scroll;
+		private function _refresh(per:Number, maxValue:Number,minValue:Number=0):void 
+		{			
+			if (per > 1)
+			{
+				_maxValue = maxValue;
+				_minValue = minValue;
 				
-			
-			}else{
-				//5像素内，自动吸附到顶端
-				propValue = (scroll < (_track[_info.xy] + 5))
-											? _track[_info.xy]
-											: scroll;
+				_block.visible=true;
+				_scrollBar.mouseChildren=true;
+
+				_block[_width_height]=_allDistance*(1/per);
+				_rollDistance=_btnRightDown[_x_y]-_btnLeftUp[_x_y]-_btnLeftUp[_width_height]-_block[_width_height];
+				refreshBlockPosiitonByValue();
+			} 
+			else 
+			{
+				_maxValue = 0;
+				_minValue = 0;
+				
+				_block.visible=false;
+				_scrollBar.mouseChildren=false;
 			}
-			
-			
-			//不使用缓动，直接改变thumb位置
-			_thumb[_info.xy] = propValue;
-			
-			
-			moveContent();
 		}
-		
-		
-		//舞台，松开鼠标
-		private function stageMouseUp(event:MouseEvent):void
+		private function dispatch():void
+		{			
+			if (_fun!=null)
+			{
+				_fun(_currentValue);
+			}
+		}
+		private function blockDownHandler(event : MouseEvent):void 
 		{
-			clearTimer();
-			_thumb.stopDrag();
-			moveContent();
+			_block.stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);	
+			_block.stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);	
+			
+			var dragRect:Rectangle;
+			if (_scollType == YScrollBar.V)
+			{
+				dragRect = new Rectangle(_block.x, _blockStartPosition, 0, _rollDistance);
+			}
+			else if (_scollType == YScrollBar.H)
+			{
+				dragRect = new Rectangle(_blockStartPosition, _block.y, _rollDistance, 0);
+			}
+			_block.startDrag(false, dragRect);
 		}
-		
-		
-		//清除计时器
-		private function clearTimer():void
+        private function mouseMoveHandler(evn:MouseEvent):void
 		{
-			if (_moveContentTimer.running) _moveContentTimer.reset();
-			if (_repeatDelayTimer.running) _repeatDelayTimer.reset();
-			if (_moveThumbTimer.running)   _moveThumbTimer.reset();
+			getValueByBlockPosition();
+			dispatch();
 		}
-		
-		
-		
-		
+		private function mouseUpHandler(event : MouseEvent):void 
+		{
+			_block.stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);	
+			_block.stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);	
+			
+			_block.stopDrag();
+		}
+		private function pathClickHandler(event : MouseEvent):void
+		{
+			var mousePosition:Number;
+			var nowPosition:Number;
+			
+			if (_scollType == YScrollBar.H)
+			{
+				mousePosition = _scrollBar.mouseX; 
+			}
+			else if (_scollType == YScrollBar.V)
+			{
+				mousePosition = _scrollBar.mouseY; 
+			}
+			if (mousePosition <= _block[_x_y]&& mousePosition > _btnLeftUp[_x_y]+_btnLeftUp[_width_height])
+			{
+				nowPosition = mousePosition;
+			}
+			else if (mousePosition > _block[_x_y] + _block[_width_height] && mousePosition < _btnRightDown[_x_y])
+			{
+				if (mousePosition + _block[_width_height] > _btnRightDown[_x_y])
+				{
+					nowPosition = _btnRightDown[_x_y] - _block[_width_height];
+				}
+				else
+				{
+					nowPosition = mousePosition;
+				}
+			}	
+			_block[_x_y] = nowPosition;
+			getValueByBlockPosition();
+			dispatch();
+		}
+		private function rightDownBtnClickHandler(event : MouseEvent):void 
+		{
+			blockScrollDown();
+		}
+		private function leftUpBtnClickHandler(event : MouseEvent):void
+		{
+			blockScrollUp();
+		}
+		//滑块向上滚
+		private function blockScrollUp():void
+		{
+			if (_currentValue > _minValue)
+			{
+				if (_currentValue-_step > _minValue)
+				{
+					_currentValue-= _step;
+				}
+				else 
+				{
+					_currentValue = _minValue;
+				}
+				refreshBlockPosiitonByValue();
+				dispatch();
+			}
+		}
+		//滑块向下滚
+		private function blockScrollDown():void
+		{
+			if (_currentValue < _maxValue)
+			{
+				if (_currentValue+_step < _maxValue)
+				{
+					_currentValue += _step;
+				}
+				else 
+				{
+					_currentValue = _maxValue;
+				}
+				refreshBlockPosiitonByValue();
+				dispatch();
+			}
+		}
+		/**
+		 * 根据value值刷新滑块的位置
+		 */
+		private function refreshBlockPosiitonByValue():void
+		{
+			var per:Number = (_currentValue-_minValue) / (_maxValue-_minValue);
+			_block[_x_y]=_btnLeftUp[_x_y] + _btnLeftUp[_width_height] + _rollDistance * per;
+		}
+		/**
+		 * 根据滑块位置计算value值
+		 */
+		private function getValueByBlockPosition():void
+		{
+			_currentValue=(_block[_x_y]-(_btnLeftUp[_x_y]+_btnLeftUp[_width_height]))/_rollDistance*(_maxValue-_minValue)+_minValue;
+		}
 		
 		/**
-		 * 设置按下arrowUp或arrowDown时，滑块滚动的增量(默认为10)
+		 * 滚动滚动条
+		 * @param	dir block滚动方向。向上(左)：YScrollBar.UP_OR_LEFT,向下（右）：YScrollBar.DOWN_OR_RIGHT
 		 */
-		public function set thumbScrollSize(value:uint):void 
+		public function scrollTo(dir:String):void
 		{
-			_thumbScrollSize = value;
-		}
-		
-		
-		/**
-		 * 显示区域有改变时，请调用该方法，更新滚动显示
-		 */
-		public function change():void
-		{
-			if(_content[_info.wh] <= _mask[_info.wh]){
-				_enabled = false;
-				removeListeners();
-				
-				//滑块位置还原
-				_thumb[_info.xy] = _rThumb[_info.xy];
-				
-			}else {
-				_enabled = true;
-				addListeners();
+		    if (dir == UP_OR_LEFT)
+			{
+				blockScrollUp();
 			}
-			
-			moveContent();
-			
-			if(_hideThumb) _scrollBar.visible = _enabled;
+			else
+			{
+				blockScrollDown();
+			}
 		}
-		
-		
-		
 		/**
-		 * 清除事件，以及对其他元件的引用
+		 * 初始化滚动条
+		 * @param	scrollBar 滚动条组件
+		 * @param	scollType 显示模式（横向或者纵向）
 		 */
-		public function clear():void
+		public function init(scrollBar:Sprite, scollType:String = YScrollBar.V):void
 		{
-			_moveContentTimer.removeEventListener(TimerEvent.TIMER, moveContentTimerHandler);
-			_repeatDelayTimer.removeEventListener(TimerEvent.TIMER, repeatDelayTimerHandler);
-			_moveThumbTimer.removeEventListener(TimerEvent.TIMER, moveThumbTimerHandler);
-			removeListeners();
-			clearTimer();
+			_scollType = scollType;
 			
+			checkObject(scrollBar);
+			initObject();
+		}
+	    /**
+	     * 重绘滚动条
+	     * @param	per 显示区域（即遮罩）和内容的宽（高）比例
+	     * @param	maxValue 最大值（即内容的高（宽）度和遮罩的高（宽）度的差值）
+	     */
+		public function refresh(per:Number, maxValue:Number,minValue:Number=0):void
+		{
+			_refresh(per,maxValue,minValue);
+		}
+		/**
+		 * 释放对内容和滚动条对象的引用
+		 */
+		public function free():void
+		{
+			_btnLeftUp.removeEventListener(MouseEvent.MOUSE_DOWN, leftUpBtnClickHandler);//点击左或上按钮
+			_btnRightDown.removeEventListener(MouseEvent.MOUSE_DOWN, rightDownBtnClickHandler);//点击右或下按钮
+			_block.removeEventListener(MouseEvent.MOUSE_DOWN, blockDownHandler);//点击滑块
+			_path.removeEventListener(MouseEvent.MOUSE_DOWN, pathClickHandler);//点击滑道
 			
 			_scrollBar = null;
-			_content = null;
-			_track = null;
-			_thumb = null;
-			_arrowUp = null;
-			_arrowDown = null;
+			
+			_block = null;
+			_path = null;
+			_btnLeftUp = null;
+			_btnRightDown = null;
+			_fun = null;
 		}
-		//
+		/**
+		 * 即遮罩的纵（横）坐标值和内容的纵（横）坐标的差值
+		 */
+		public function get value():Number
+		{
+			return _currentValue;
+		}
+		public function set value(v:Number):void
+		{
+			if (v >= _minValue && v <= _maxValue)
+			{
+				_currentValue=v;
+				refreshBlockPosiitonByValue();
+				dispatch();
+			}
+			else
+			{
+				throw new Error("value 值小于了最小值，或者大于了最大值");
+			}
+		}
+		/**
+		 * value值改变时调用的方法
+		 */
+		public function set valueChangeHandler(fun:Function):void
+		{
+			_fun = fun;
+		}
+		/**
+		 * 点击按钮时滚动的步值
+		 */
+		public function set step(n:Number):void
+		{
+			_step = n;
+		}
+		public function get step():Number
+		{
+			return _step;
+		}
+		/**
+		 * 最大值
+		 */
+		public function set maxValue(n:Number):void
+		{
+			_maxValue = n;
+			refreshBlockPosiitonByValue();
+		}
+		public function get maxValue():Number
+		{
+			return _maxValue;
+		}
+		/**
+		 * 最小值
+		 */
+		public function set minValue(n:Number):void
+		{
+			_minValue = n;
+			refreshBlockPosiitonByValue();
+		}
+		public function get minValue():Number
+		{
+			return _minValue;
+		}
 	}
-	
 }
