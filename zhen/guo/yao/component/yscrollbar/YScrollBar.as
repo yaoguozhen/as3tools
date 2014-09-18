@@ -39,6 +39,8 @@ package zhen.guo.yao.component.yscrollbar
 		private var _maxValue:Number = 1;//最大值
 		private var _step:Number = 5;//点击按钮时，滚动的步值
 		
+		private var _blockLastPosition:Number = -1000000;//用来判断鼠标拖动时，滑块是否滑动了
+		
 		private var _fun:Function;//value值改变时调用的方法
 
 		/**
@@ -162,8 +164,20 @@ package zhen.guo.yao.component.yscrollbar
 		}
         private function mouseMoveHandler(evn:MouseEvent):void
 		{
-			getValueByBlockPosition();
-			dispatch();
+			if (_blockLastPosition == -1000000)
+			{
+				_blockLastPosition = _block[_x_y];
+			}
+			else
+			{
+				if (_blockLastPosition != _block[_x_y])
+				{
+					getValueByBlockPosition();
+					dispatch();
+					
+			        _blockLastPosition = _block[_x_y];
+				}
+			}
 		}
 		private function mouseUpHandler(event : MouseEvent):void 
 		{
@@ -315,6 +329,7 @@ package zhen.guo.yao.component.yscrollbar
 			_btnLeftUp = null;
 			_btnRightDown = null;
 			_fun = null;
+			_blockLastPosition = -1000000
 		}
 		/**
 		 * 即遮罩的纵（横）坐标值和内容的纵（横）坐标的差值
