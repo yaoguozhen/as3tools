@@ -33,8 +33,65 @@
 		 * @param	param 要发送的参数
 		 * @param	onResult 请求结果回调函数.
 		 */
-		public function YURLLoader(url:String, methord:String=YURLLoader.GET, param:Object=null, onResult:Function=null):void
+		public function YURLLoader():void
 		{
+			initLoader();
+		}
+		private function initLoader():void
+		{
+			_loader = new URLLoader();
+			_loader.addEventListener(Event.COMPLETE, loadComHandler);
+			_loader.addEventListener(IOErrorEvent.IO_ERROR, loadIOErrHandler);
+			_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, loadSECErrHandler);
+		}
+		private function loadComHandler(evn:Event):void
+		{
+			if(_onResult!=null)
+			{
+				var data:String = URLLoader(evn.target).data;
+			
+				var obj:Object = new Object();
+				obj.result = SEND_SUCCESS;
+				obj.data = data;
+				obj.url=_url;
+			
+		    	_onResult(obj);
+			}
+		}
+		private function loadIOErrHandler(evn:IOErrorEvent):void
+		{
+			if(_onResult!=null)
+			{
+            	var obj:Object = new Object();
+				obj.result = SEND_FAIL_IO;
+				obj.data = evn.text;
+				obj.url=_url;
+			
+		   	    _onResult(obj);
+			}
+		}
+		private function loadSECErrHandler(evn:IOErrorEvent):void
+		{
+			if(_onResult!=null)
+			{
+            	var obj:Object = new Object();
+				obj.result = SEND_FAIL_SEC;
+				obj.data = evn.text;
+				obj.url=_url;
+			
+		    	_onResult(obj);
+			}
+		}
+		private function removeListeners():void
+		{
+			_loader.removeEventListener(Event.COMPLETE, loadComHandler);
+			_loader.removeEventListener(IOErrorEvent.IO_ERROR, loadIOErrHandler);
+			_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, loadSECErrHandler);
+		}
+		public function load(url:String, methord:String=YURLLoader.GET, param:Object=null, onResult:Function=null):void
+		{
+			close();
+			
 			_onResult = onResult;
 			_url=url;
 			
@@ -55,55 +112,20 @@
 				urlRequest.data = urlVal;
 			}
 			
-			_loader = new URLLoader();
-			if (_onResult!=null)
-			{
-				_loader.addEventListener(Event.COMPLETE, loadComHandler);
-				_loader.addEventListener(IOErrorEvent.IO_ERROR, loadIOErrHandler);
-				_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, loadSECErrHandler);
-			}
 			_loader.load(urlRequest);
 		}
-		private function loadComHandler(evn:Event):void
+		public function close():void
 		{
-			removeListeners();
-			
-			var data:String = URLLoader(evn.target).data;
-			
-			var obj:Object = new Object();
-			obj.result = SEND_SUCCESS;
-			obj.data = data;
-			obj.url=_url;
-			
-		    _onResult(obj);
-		}
-		private function loadIOErrHandler(evn:IOErrorEvent):void
-		{
-			removeListeners();
-			
-            var obj:Object = new Object();
-			obj.result = SEND_FAIL_IO;
-			obj.data = evn.text;
-			obj.url=_url;
-			
-		    _onResult(obj);
-		}
-		private function loadSECErrHandler(evn:IOErrorEvent):void
-		{
-			removeListeners();
-			
-            var obj:Object = new Object();
-			obj.result = SEND_FAIL_SEC;
-			obj.data = evn.text;
-			obj.url=_url;
-			
-		    _onResult(obj);
-		}
-		private function removeListeners():void
-		{
-			_loader.removeEventListener(Event.COMPLETE, loadComHandler);
-			_loader.removeEventListener(IOErrorEvent.IO_ERROR, loadIOErrHandler);
-			_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, loadSECErrHandler);
+			try
+			{
+				_loader.close()
+			}
+			catch(err:Error)
+			{
+				
+			}
+			_onResult=null;
+			_url=null;
 		}
 	}
 
