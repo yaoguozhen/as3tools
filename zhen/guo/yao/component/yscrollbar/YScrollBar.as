@@ -4,13 +4,12 @@ package zhen.guo.yao.component.yscrollbar
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.EventDispatcher;
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	import flash.display.DisplayObject;
 
 
-	public class YScrollBar extends EventDispatcher {
+	public class YScrollBar {
 
 		public static const V:String = "v";//纵向滚动条
 		public static const H:String = "h";//横向滚动条
